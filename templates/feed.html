@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsLens — {{ user_name }}'s Feed</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --mid:      #4a4a6a;
+      --muted:    #9090aa;
+      --paper:    #f7f6f3;
+      --white:    #ffffff;
+      --accent:   #e63946;
+      --accent2:  #457b9d;
+      --green:    #2d6a4f;
+      --border:   #dddde8;
+      --radius:   6px;
+      --shadow:   0 2px 12px rgba(26,26,46,.07);
+      --col:      700px;
+    }
+
+    
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--paper);
+      color: var(--ink);
+      padding-bottom: 4rem;
+    }
+
+    /* ── Top bar ──────────────────────────────────────────────── */
+    .topbar {
+      background: var(--ink);
+      color: var(--white);
+      padding: .9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .topbar-logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -.5px;
+    }
+    .topbar-logo span { color: var(--accent); }
+    .topbar-meta {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .8rem;
+      color: #aab0cc;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    /* ── Page header ──────────────────────────────────────────── */
+    .page-header {
+      max-width: var(--col);
+      margin: 2rem auto 1.2rem;
+      padding: 0 1.2rem;
+      border-left: 4px solid var(--accent);
+      padding-left: 1rem;
+    }
+    .page-header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .page-header p {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: .35rem;
+    }
+    .interest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-top: .7rem;
+    }
+    .interest-tag {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: #e8eaf6;
+      color: var(--mid);
+      padding: .2rem .6rem;
+      border-radius: 20px;
+    }
+
+    /* ── Refresh link ─────────────────────────────────────────── */
+    .refresh-bar {
+      max-width: var(--col);
+      margin: 0 auto .5rem;
+      padding: 0 1.2rem;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .refresh-bar a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+    .refresh-bar a:hover { text-decoration: underline; }
+
+    /* ── Article card ─────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: var(--col);
+      margin: 1.2rem auto;
+      padding: 1.8rem 2rem;
+      position: relative;
+    }
+
+    /* Category badge */
+    .badge {
+      display: inline-block;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .2rem .55rem;
+      border-radius: 3px;
+      margin-bottom: .75rem;
+    }
+    /* Each category gets a distinct tint */
+    .badge-Technology  { background: #dbeafe; color: #1e40af; }
+    .badge-Politics    { background: #fce7f3; color: #9d174d; }
+    .badge-Sports      { background: #d1fae5; color: #065f46; }
+    .badge-Science     { background: #ede9fe; color: #5b21b6; }
+    .badge-Business    { background: #fef9c3; color: #854d0e; }
+    .badge-Environment { background: #dcfce7; color: #166534; }
+    .badge-India       { background: #fff7ed; color: #9a3412; }
+    .badge-General     { background: #f1f5f9; color: var(--mid); }
+
+    /* Headline */
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+    }
+    .card-title a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .card-title a:hover { color: var(--accent); }
+
+    /* Section label shared style */
+    .section-label {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .35rem;
+    }
+
+    /* Simple summary */
+    .summary-text {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Divider between sections */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.1rem 0;
+    }
+
+    /* Why it matters */
+    .matters-block {
+      display: flex;
+      gap: .6rem;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+    .matters-icon {
+      font-size: 1rem;
+      line-height: 1.7;
+      flex-shrink: 0;
+    }
+    .matters-text {
+      font-size: .95rem;
+      line-height: 1.65;
+      color: var(--mid);
+      font-style: italic;
+    }
+
+    /* Background context */
+    .background-block {
+      background: #f0f4f8;
+      border-left: 3px solid var(--accent2);
+      padding: .75rem 1rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-bottom: 1.25rem;
+    }
+    .background-text {
+      font-size: .9rem;
+      line-height: 1.65;
+      color: var(--mid);
+    }
+
+    /* ── Reaction buttons ─────────────────────────────────────────── */
+    .reaction-bar {
+      display: flex;
+      gap: .6rem;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: .8rem;
+      border-top: 1px solid var(--border);
+    }
+    .reaction-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: .25rem .75rem;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: all .18s;
+      color: var(--mid);
+    }
+    .reaction-btn:hover         { border-color: var(--accent2); color: var(--accent2); }
+    .reaction-btn.active-up     { background: #d1fae5; border-color: #065f46; color: #065f46; }
+    .reaction-btn.active-down   { background: #fee2e2; border-color: #991b1b; color: #991b1b; }
+    .reaction-label {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    
+    
+
+    /* ── Empty state ──────────────────────────────────────────── */
+    .empty-state {
+      max-width: var(--col);
+      margin: 3rem auto;
+      text-align: center;
+      padding: 0 1.2rem;
+    }
+    .empty-state h2 {
+      font-size: 1.3rem;
+      margin-bottom: .6rem;
+    }
+    .empty-state p {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .95rem;
+      color: var(--muted);
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .card { padding: 1.3rem 1.1rem; margin: .9rem .6rem; }
+      .page-header { margin: 1.2rem .6rem .8rem; }
+      .refresh-bar { margin: 0 .6rem .4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top navigation bar -->
+  <nav class="topbar">
+    <div class="topbar-logo">News<span>Lens</span></div>
+    <div class="topbar-meta">
+      {{ user_name }}'s feed<br>
+      {{ today }}
+    </div>
+  </nav>
+
+  <!-- Page heading -->
+  <header class="page-header">
+    <h1>Good morning, {{ user_name }}.</h1>
+    <p>{{ articles | length }} stories · ranked by your interests</p>
+    <div class="interest-tags">
+      {% for tag in interests %}
+        <span class="interest-tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  </header>
+
+  <!-- Refresh link -->
+  <div class="refresh-bar">
+    <a href="/feed?refresh=1">↻ Refresh feed</a>
+    &nbsp;·&nbsp;
+    <a href="/">Change interests</a>
+  </div>
+
+  <!-- Article cards -->
+  <main>
+    {% if articles %}
+
+      {% for article in articles %}
+      <article class="card">
+
+        <!-- Category badge -->
+        <span class="badge badge-{{ article.category | replace(' ', '') }}">
+          {{ article.category }}
+        </span>
+
+        <!-- Headline linking to original source -->
+        <h2 class="card-title">
+          {% if article.link %}
+            <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer">
+              {{ article.title }}
+            </a>
+          {% else %}
+            {{ article.title }}
+          {% endif %}
+        </h2>
+
+        <!-- ① Simple summary -->
+        {% if article.simple_summary %}
+          <p class="section-label">What happened</p>
+          <p class="summary-text">{{ article.simple_summary }}</p>
+        {% endif %}
+
+        <!-- ② Why it matters -->
+        {% if article.why_it_matters %}
+          <hr class="section-divider">
+          <p class="section-label">Why it matters</p>
+          <div class="matters-block">
+            <span class="matters-icon" aria-hidden="true">💡</span>
+            <p class="matters-text">{{ article.why_it_matters }}</p>
+          </div>
+        {% endif %}
+
+        <!-- ③ Background context (shown only when present) -->
+        {% if article.background %}
+          <hr class="section-divider">
+          <p class="section-label">Background</p>
+          <div class="background-block">
+            <p class="background-text">{{ article.background }}</p>
+          </div>
+        {% endif %}
+
+        <!-- ④ Reaction buttons — stored via JSON POST, no page reload -->
+        <div class="reaction-bar" id="reaction-{{ article.id }}">
+          <span class="reaction-label">Was this useful?</span>
+          <button class="reaction-btn"
+                  onclick="sendReaction({{ article.id }}, 1, this)"
+                  title="Thumbs up">
+            👍
+          </button>
+          <button class="reaction-btn"
+                  onclick="sendReaction({{ article.id }}, -1, this)"
+                  title="Thumbs down">
+            👎
+          </button>
+        </div>
+
+        
+
+      </article>
+      {% endfor %}
+
+    {% else %}
+      <!-- Empty state — shown if pipeline returned 0 articles -->
+      <div class="empty-state">
+        <h2>No stories today — yet.</h2>
+        <p>
+          We couldn't fetch articles right now. This usually means the RSS feeds
+          are slow or the AI quota was hit. Try
+          <a href="/feed?refresh=1">refreshing</a> in a few minutes.
+        </p>
+      </div>
+    {% endif %}
+  </main>
+
+  
+
+  <script>
+  async function sendReaction(articleId, reaction, btn) {
+    const resp = await fetch("/react", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ article_id: articleId, reaction: reaction }),
+    });
+
+    if (!resp.ok) return;
+
+    const bar = document.getElementById("reaction-" + articleId);
+    bar.querySelectorAll(".reaction-btn").forEach(b => {
+      b.classList.remove("active-up", "active-down");
+    });
+    btn.classList.add(reaction === 1 ? "active-up" : "active-down");
+  }
+  </script>
+
+</body>
+</html>
+

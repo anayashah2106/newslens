@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsLens — Your personalised news explainer</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --mid:      #4a4a6a;
+      --muted:    #9090aa;
+      --paper:    #f7f6f3;
+      --white:    #ffffff;
+      --accent:   #e63946;        /* headline red — newspaper masthead feel */
+      --accent2:  #457b9d;        /* category blue */
+      --border:   #dddde8;
+      --radius:   6px;
+      --shadow:   0 2px 12px rgba(26,26,46,.08);
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .masthead {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .masthead-logo {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--ink);
+      border-bottom: 4px solid var(--accent);
+      display: inline-block;
+      padding-bottom: .2rem;
+      line-height: 1;
+    }
+    .masthead-logo span { color: var(--accent); }
+    .masthead-tagline {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: .6rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    /* ── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2.2rem 2.5rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      color: var(--mid);
+      font-weight: 400;
+      margin-bottom: 1.6rem;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* ── Form elements ────────────────────────────────────────── */
+    label.field-label {
+      display: block;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--mid);
+      margin-bottom: .4rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: .65rem .85rem;
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--paper);
+      transition: border-color .18s;
+      margin-bottom: 1.6rem;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent2);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .55rem 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+    .checkbox-grid label {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .95rem;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .checkbox-grid input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: .8rem;
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .btn-primary:hover { background: #c1121f; }
+
+    /* ── Error banner ─────────────────────────────────────────── */
+    .error-banner {
+      background: #fff0f1;
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius);
+      padding: .7rem 1rem;
+      color: var(--accent);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .9rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Footer note ──────────────────────────────────────────── */
+    .footer-note {
+      margin-top: 1.8rem;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: .8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="masthead-logo">News<span>Lens</span></div>
+    <p class="masthead-tagline">News explained simply · updated daily</p>
+  </header>
+
+  <main class="card">
+    <h2>Tell us what you care about and we'll do the rest.</h2>
+
+    {% if error %}
+      <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/setup">
+
+      <label class="field-label" for="name">Your first name</label>
+      <input type="text" id="name" name="name" placeholder="e.g. Arjun"
+             autocomplete="given-name" required>
+
+      <label class="field-label">Topics you're curious about</label>
+      <div class="checkbox-grid">
+        {% for cat in categories %}
+          <label>
+            <input type="checkbox" name="interests" value="{{ cat }}">
+            {{ cat }}
+          </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary">Build my feed →</button>
+    </form>
+  </main>
+
+  <p class="footer-note">
+    No account needed · Powered by Groq AI · Updates every morning at 7 AM
+  </p>
+
+</body>
+</html>

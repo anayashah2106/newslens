@@ -1,0 +1,60 @@
+# ── Environment variables — NEVER commit API keys ──────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python cache ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# ── Virtual environment ─────────────────────────────────────────────
+venv/
+env/
+.venv/
+ENV/
+
+# ── Databases — contain user data ──────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── HuggingFace / sentence-transformers model cache ────────────────
+.cache/
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# ── NLTK downloaded data ────────────────────────────────────────────
+nltk_data/
+
+# ── Newspaper3k article cache ───────────────────────────────────────
+.newspaper_scraper_cache/
+
+# ── OS files ────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── VS Code ─────────────────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+# ── Logs ────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Pytest / coverage ───────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Distribution / build ────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
