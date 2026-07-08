@@ -6,10 +6,10 @@
 
 ## Demo
 
+<p align="center">
+  <img src="screenshots/demo.gif" width="100%">
+</p>
 
-![Demo](screenshots/demo.gif)
-
----
 
 ## What It Does
 
