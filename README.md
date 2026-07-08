@@ -33,7 +33,7 @@ RSS Feeds (10+ sources across 9 categories)
 news_collector.py     → fetch, deduplicate, date-filter articles
         ↓
 personalizer.py       → TF-IDF + cosine similarity ranks by user interests
-                        + feedback-weighted boost from reaction history
+                       
         ↓
 categorizer.py        → hard rules first, then sentence-transformer embeddings
         ↓
@@ -48,11 +48,10 @@ app.py (Flask)        → SQLite cache + Jinja2 templates → personalised feed
 1. User selects interest categories on the landing page
 2. Flask saves preferences to SQLite, redirects to `/feed`
 3. Pipeline fetches up to 20 articles per selected category from RSS
-4. TF-IDF + feedback boosts rank all articles by relevance
+4. TF-IDF  rank all articles by relevance
 5. Category balancing distributes slots proportionally (15–25 articles total)
 6. For each article: full text fetched via newspaper3k, category classified, summaries generated
 7. Results cached in SQLite — next visit loads instantly
-8. APScheduler refreshes all feeds at 7:00 AM daily
 
 ---
 
@@ -69,7 +68,6 @@ app.py (Flask)        → SQLite cache + Jinja2 templates → personalised feed
 | Background | wikipedia-python | Background context per article |
 | NLP | spaCy (en_core_web_sm) | POS tagging, NER, sentence segmentation |
 | Storage | SQLite | User profiles, article cache, reaction history |
-| Scheduling | APScheduler | Daily 7 AM pipeline refresh |
 
 ---
 
@@ -125,8 +123,7 @@ Open `http://localhost:5000` in your browser.
 1. Enter your name and select interest categories
 2. Click **Build my feed**
 3. Wait ~60–90 seconds for the first pipeline run (subsequent visits load from cache instantly)
-4. React to articles with 👍 / 👎 — future runs will factor in your preferences
-5. Force a fresh pipeline run: `http://localhost:5000/feed?refresh=1`
+4. Force a fresh pipeline run: `http://localhost:5000/feed?refresh=1`
 
 ---
 
@@ -134,9 +131,6 @@ Open `http://localhost:5000` in your browser.
 
 **TF-IDF Personalisation**
 User interests become a query document. All fetched articles are vectorised using TF-IDF. Cosine similarity between the query vector and each article vector determines ranking — articles semantically close to what you care about score highest.
-
-**Feedback-Weighted Ranking**
-Thumbs up/down reactions are stored per article. The next pipeline run computes category and source boost multipliers from reaction history. Final score = `TF-IDF score × category_boost × source_boost`. This is implicit feedback learning — the system improves without requiring the user to reconfigure settings.
 
 **Embedding-Based Classification**
 Each category is described by a natural language sentence and embedded into a 384-dimensional vector using `all-MiniLM-L6-v2`. Incoming articles are embedded the same way and classified by finding the closest category vector via cosine similarity. Hard rules (unambiguous title patterns) run first for instant, free classification.
