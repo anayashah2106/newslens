@@ -159,5 +159,5 @@ Working prototype built as a portfolio project. Known limitations:
 
 ## Author
 
-Built by **[Your Name]**
-[LinkedIn](https://linkedin.com/in/yourprofile) · [Email](mailto:you@email.com)
+Built by **Anaya Shah**
+[LinkedIn](https://linkedin.com/in/anayashah21) · [Email](mailto:anayashah.2106@gmail.com)
