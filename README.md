@@ -160,4 +160,4 @@ Working prototype built as a portfolio project. Known limitations:
 ## Author
 
 Built by **Anaya Shah**
-[LinkedIn](https://linkedin.com/in/anayashah21) · [Email](mailto:anayashah.2106@gmail.com)
+- [LinkedIn](https://linkedin.com/in/anayashah21) · [Email](mailto:anayashah.2106@gmail.com)
